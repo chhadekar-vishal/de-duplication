@@ -6,48 +6,59 @@ This document contains the Graphviz DOT diagram for the file de-duplication syst
 
 The following diagram illustrates the complete workflow of how files are processed through the de-duplication system, from initial upload to final storage or duplicate detection.
 
-## Graphviz DOT Diagram
+## Process Flow Diagram
 
-```dot
-digraph G {
-    node [shape=box, style=rounded, fontsize=10]
-
-    UserUpload [label="User Uploads File"]
-    Hashing [label="Compute SHA-256 Hash"]
-    DBCheck [label="Check Hash in DB"]
-    Duplicate [label="Duplicate Found: Skip Processing", shape=diamond]
-    Process [label="Unique File: Process & Store"]
-    Store [label="Save File + Hash in DB"]
-
-    UserUpload -> Hashing -> DBCheck
-    DBCheck -> Duplicate [label="Hash Exists"]
-    DBCheck -> Process [label="No Match"]
-    Process -> Store
-}
+```mermaid
+graph TB
+    UserUpload[User Uploads File]
+    Hashing[Compute SHA-256 Hash]
+    DBCheck[Check Hash in DB]
+    Duplicate{Duplicate Found?}
+    SkipProcess[Skip Processing - Return Existing]
+    Process[Unique File: Process & Store]
+    Store[Save File + Hash in DB]
+    
+    UserUpload --> Hashing
+    Hashing --> DBCheck
+    DBCheck --> Duplicate
+    Duplicate -->|Hash Exists| SkipProcess
+    Duplicate -->|No Match| Process
+    Process --> Store
+    
+    style UserUpload fill:#e1f5fe
+    style Hashing fill:#f3e5f5
+    style DBCheck fill:#fff3e0
+    style Duplicate fill:#ffebee
+    style SkipProcess fill:#e8f5e8
+    style Process fill:#fce4ec
+    style Store fill:#f1f8e9
 ```
 
-## How to Render This Diagram
+## How to View This Diagram
+
+### GitHub/VS Code
+- This Mermaid diagram will render automatically in:
+  - GitHub README files and markdown files
+  - VS Code with Mermaid extension
+  - Most modern markdown viewers
 
 ### Online Tools
-1. **Graphviz Online**: Visit https://dreampuf.github.io/GraphvizOnline/
-2. **Viz.js**: Visit http://viz-js.com/
-3. Copy and paste the DOT code above into any of these tools
+1. **Mermaid Live Editor**: Visit https://mermaid.live/
+2. **GitHub Gist**: Create a gist with this markdown
+3. **GitLab**: Native Mermaid support in markdown files
 
-### Local Rendering
-If you have Graphviz installed locally:
+### Local Setup
+If you want to render locally:
 
 ```bash
-# Save the DOT code to a file named 'dedup-flow.dot'
-dot -Tpng dedup-flow.dot -o dedup-flow.png
-dot -Tsvg dedup-flow.dot -o dedup-flow.svg
-dot -Tpdf dedup-flow.dot -o dedup-flow.pdf
-```
+# Install Mermaid CLI
+npm install -g @mermaid-js/mermaid-cli
 
-### Installation of Graphviz
-- **Windows**: Download from https://graphviz.org/download/
-- **macOS**: `brew install graphviz`
-- **Ubuntu/Debian**: `sudo apt-get install graphviz`
-- **CentOS/RHEL**: `sudo yum install graphviz`
+# Render to different formats
+mmdc -i process-flow.md -o process-flow.png
+mmdc -i process-flow.md -o process-flow.svg
+mmdc -i process-flow.md -o process-flow.pdf
+```
 
 ## Process Flow Explanation
 
